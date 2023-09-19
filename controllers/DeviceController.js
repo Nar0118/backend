@@ -5,7 +5,7 @@ const { Device, Rating, User, Type, Brand } = require("../models/models");
 class DeviceController {
   async create(req, res, next) {
     try {
-      let { name, price, brandId, typeId, description, img } = req.body;
+      const { name, price, brandId, typeId, description, img } = req.body;
 
       const device = await Device.create({
         name,
@@ -48,22 +48,23 @@ class DeviceController {
   }
 
   async getAll(req, res) {
-    let { brandId, typeId, page, limit } = req.query;
-    page = page || 1;
-    limit = limit || 9;
-    let offset = page * limit - limit;
+    const { brandId, typeId, page, limit } = req.query;
+    const offset = (page - 1) * limit;
     let devices;
-    // if (!brandId && !typeId) {/
-    // devices = await Device.findAndCountAll({ limit, offset });
-    devices = await Device.findAndCountAll({
-      include: [
-        {
-          model: Rating,
-          required: false,
-        },
-      ],
-    });
-    // } else if (brandId && !typeId) {
+    if (!brandId && !typeId) {
+      devices = await Device.findAndCountAll({
+        include: [
+          {
+            model: Rating,
+            required: false,
+          },
+        ],
+        limit: limit || 10,
+        offset: offset || 1,
+        order: [["createdAt", "DESC"]],
+      });
+    }
+    // else if (brandId && !typeId) {
     //   devices = await Device.findAndCountAll({
     //     where: { brandId },
     //     limit,
@@ -97,6 +98,31 @@ class DeviceController {
     await device.destroy();
 
     return res.status(204).json({ message: "Device removed successfully" });
+  }
+
+  async edit(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, price, brandId, typeId, description, img } = req.body;
+      const device = await Device.findByPk(id);
+
+      if (!device) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      device.name = name;
+      device.price = price;
+      device.brandId = brandId;
+      device.typeId = typeId;
+      device.description = description;
+      device.img = img;
+
+      await device.save();
+
+      return res.status(200).json(device);
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
 }
 
