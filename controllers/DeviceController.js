@@ -60,7 +60,7 @@ class DeviceController {
           },
         ],
         limit: limit || 10,
-        offset: offset || 1,
+        offset: offset || 0,
         order: [["createdAt", "DESC"]],
       });
     }

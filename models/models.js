@@ -109,22 +109,6 @@ const Rating = sequelize.define("rating", {
   },
 });
 
-const DeviceInfo = sequelize.define("device_info", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
 const TypeBrand = sequelize.define("type_brand", {
   id: {
     type: DataTypes.INTEGER,
@@ -207,9 +191,6 @@ Rating.belongsTo(Device);
 Device.hasMany(BasketDevice);
 BasketDevice.belongsTo(Device);
 
-Device.hasMany(DeviceInfo, { as: "info" });
-DeviceInfo.belongsTo(Device);
-
 Type.belongsToMany(Brand, { through: TypeBrand });
 Brand.belongsToMany(Type, { through: TypeBrand });
 
@@ -221,7 +202,6 @@ module.exports = {
   Type,
   Brand,
   Rating,
-  DeviceInfo,
   TypeBrand,
   Order,
   OrderDevice,

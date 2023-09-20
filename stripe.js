@@ -23,7 +23,7 @@ router.post("/create-checkout-session", async (req, res) => {
     cancel_url: `${process.env.DOMAIN}/checkout`,
   });
   if (session) {
-    OrderController.create({ userId, subtotal, deviceIds });
+    // here should be create a order via Order model
   }
   res.send({ url: session.url });
 });

@@ -2,10 +2,30 @@ const { Order, OrderDevice, Basket } = require("../models/models");
 
 class OrderController {
   async create(req, res) {
-    const { userId, subtotal, deviceIds } = req;
-    const order = await Order.create({ userId, price: subtotal });
+    const {
+      userId,
+      deviceIds,
+      price,
+      address,
+      email,
+      firstName,
+      lastName,
+      paymentMethod,
+      phone,
+    } = req.body;
 
-    deviceIds.map(async (deviceId) => {
+    const order = await Order.create({
+      userId,
+      price,
+      address,
+      phone,
+      email,
+      last_name: lastName,
+      first_name: firstName,
+      payment_method: paymentMethod,
+    });
+
+    deviceIds.forEach(async (deviceId) => {
       await OrderDevice.create({ deviceId, orderId: order.id });
     });
 
@@ -15,7 +35,7 @@ class OrderController {
       },
     });
 
-    res.json(req);
+    res.status(201).json({ message: "Order has been successfully created!" });
   }
 
   async getAll(req, res) {
