@@ -1,21 +1,20 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = function (req, res, next) {
-  if (req.method === "OPTIONS") {
-    next();
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: "Authentication required" });
   }
+
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized!" });
-    }
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    if (!decoded) {
-      return res.status(403).json({ message: "Invalid token!" });
-    }
+
     req.user = decoded;
     next();
-  } catch (e) {
-    res.status(401).json({ message: "Unauthorized!" });
+  } catch (error) {
+    return res.status(401).json({ message: "Authentication failed" });
   }
-};
+}
+
+module.exports = authMiddleware;
