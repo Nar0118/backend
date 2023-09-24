@@ -6,6 +6,10 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       price: {
         type: Sequelize.INTEGER,
         allowNull: false,

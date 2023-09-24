@@ -163,6 +163,10 @@ const Order = sequelize.define("order", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  userId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 User.hasOne(Basket);

@@ -23,6 +23,7 @@ class OrderController {
       last_name: lastName,
       first_name: firstName,
       payment_method: paymentMethod,
+      status: 'pending'
     });
 
     deviceIds?.forEach(async (deviceId) => {
