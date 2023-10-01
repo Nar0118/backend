@@ -47,6 +47,23 @@ class BasketController {
 
     res.status(204).send({ message: "Basket removed successfully" });
   }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const { quantity } = req.body;
+      const basket = await Basket.update(
+        { quantity },
+        {
+          where: { id },
+        }
+      );
+
+      return res.status(203).json(basket);
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
 }
 
 module.exports = new BasketController();

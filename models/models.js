@@ -13,10 +13,27 @@ const User = sequelize.define("user", {
   },
   password: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   role: {
     type: DataTypes.STRING,
-    defaultValue: "user",
+    allowNull: true,
+  },
+  first_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  last_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  avatar: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  phone_number: {
+    type: DataTypes.BIGINT,
+    allowNull: true,
   },
 });
 
@@ -122,6 +139,10 @@ const OrderDevice = sequelize.define("order_device", {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+  },
+  count: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
   },
 });
 
