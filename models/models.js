@@ -35,6 +35,10 @@ const User = sequelize.define("user", {
     type: DataTypes.BIGINT,
     allowNull: true,
   },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 const Basket = sequelize.define("basket", {

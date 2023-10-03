@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const generateJwt = (values) => {
   return jwt.sign({ ...values }, process.env.SECRET_KEY, {
-    expiresIn: "24h",
+    // expiresIn: "24h",
   });
 };
 
@@ -22,7 +22,7 @@ class UserController {
       last_name,
     } = req.body;
     if (!email || !password) {
-      return next(ApiError.badRequest("Email && pasword are required"));
+      return next(ApiError.badRequest("Email && password are required"));
     }
     const candidate = await User.findOne({ where: { email } });
     if (candidate) {
@@ -69,6 +69,55 @@ class UserController {
       last_name: user.last_name,
     });
     res.json({ token });
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.user;
+      const {
+        email,
+        // password,
+        role,
+        avatar,
+        address,
+        phone_number,
+        first_name,
+        last_name,
+      } = req.body;
+
+      // const hashPassword = await bcrypt.hash(password, 7);
+
+      const token = generateJwt({
+        id: req.user.id,
+        email,
+        role,
+        avatar,
+        address,
+        phone_number,
+        first_name,
+        last_name,
+      });
+console.log(444444444444444, token);
+      const user = await User.update(
+        {
+          email,
+          // password,
+          role,
+          avatar,
+          address,
+          phone_number,
+          first_name,
+          last_name,
+        },
+        {
+          where: { id },
+        }
+      );
+
+      return res.status(203).json({ user, token });
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
 
   async check(req, res, next) {
