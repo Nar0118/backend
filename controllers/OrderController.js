@@ -44,23 +44,14 @@ class OrderController {
   }
 
   async getOne(req, res) {
-    const { id } = +req.params;
-
-    res.json(id);
-  }
-
-  async getOne(req, res) {
     try {
-      const { id } = req.params;
+      const { id } = req.user;
 
-      const orders = await Order.findByPk(id, {
+      const orders = await Order.findAll({
+        where: { userId: id },
         include: Device,
         order: [["createdAt", "DESC"]],
       });
-
-      if (!orders) {
-        return res.status(404).json({ message: "Order doesn't exist" });
-      }
 
       res.status(200).json(orders);
     } catch {
@@ -69,9 +60,8 @@ class OrderController {
   }
 
   async getAll(req, res) {
-    const { id } = req.user;
     const orders = await Order.findAll({
-      where: { userId: id },
+      include: Device,
       order: [["createdAt", "DESC"]],
     });
 
