@@ -189,7 +189,7 @@ const Order = sequelize.define("order", {
     allowNull: false,
   },
   userId: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 });
