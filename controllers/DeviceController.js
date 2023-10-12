@@ -1,4 +1,5 @@
 const path = require("path");
+const { Sequelize } = require("sequelize");
 const ApiError = require("../error/ApiError");
 const { Device, Rating, User, Type, Brand } = require("../models/models");
 
@@ -48,41 +49,36 @@ class DeviceController {
   }
 
   async getAll(req, res) {
-    const { brandId, typeId, page, limit } = req.query;
+    const { brandId, typeId, page, limit, search } = req.query;
     const offset = (page - 1) * limit;
     let devices;
-    if (!brandId && !typeId) {
-      devices = await Device.findAndCountAll({
-        include: [
-          {
-            model: Rating,
-            required: false,
-          },
-        ],
-        limit: limit || 10,
-        offset: offset || 0,
-        order: [["createdAt", "DESC"]],
-      });
+    const whereCondition = {};
+    if (search && search !== "undefined") {
+      whereCondition.name = {
+        [Sequelize.Op.iLike]: `%${search}%`,
+      };
     }
-    // else if (brandId && !typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { brandId },
-    //     limit,
-    //     offset,
-    //   });
-    // } else if (!brandId && typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { typeId },
-    //     limit,
-    //     offset,
-    //   });
-    // } else if (brandId && typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { typeId, brandId },
-    //     limit,
-    //     offset,
-    //   });
-    // }
+
+    if (typeId && typeId !== "undefined") {
+      whereCondition.typeId = typeId;
+    }
+
+    if (brandId && brandId !== "undefined") {
+      whereCondition.brandId = brandId;
+    }
+
+    devices = await Device.findAll({
+      include: [
+        {
+          model: Rating,
+          required: false,
+        },
+      ],
+      limit: limit || 10,
+      offset: offset || 0,
+      order: [["createdAt", "DESC"]],
+      where: whereCondition,
+    });
 
     res.json(devices);
   }

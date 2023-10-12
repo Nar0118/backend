@@ -39,7 +39,6 @@ class UserController {
     });
 
     const token = generateJwt({
-      avatar,
       id: user.id,
       email,
       role: user.role,
@@ -66,7 +65,6 @@ class UserController {
       id: user.id,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
       address: user.address,
       phone_number: user.phone_number,
       first_name: user.first_name,
@@ -110,7 +108,6 @@ class UserController {
         id: req.user.id,
         email,
         role,
-        avatar,
         address,
         phone_number,
         first_name,
@@ -139,12 +136,15 @@ class UserController {
     }
   }
 
-  async check(_, res) {
-    // const { id } = req.query;
-    // if (!id) {
-    //   return next(ApiError.badRequest("id is missing"));
-    // }
-    res.json("id");
+  async check(req, res) {
+    const { id } = req.user;
+    const user = await User.findOne({ id });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json(user);
   }
 }
 

@@ -59,13 +59,35 @@ class OrderController {
     }
   }
 
-  async getAll(req, res) {
-    const orders = await Order.findAll({
-      include: Device,
-      order: [["createdAt", "DESC"]],
-    });
+  async getAll(_, res) {
+    try {
+      const orders = await Order.findAll({
+        include: Device,
+        order: [["createdAt", "DESC"]],
+      });
 
-    res.json(orders);
+      res.status(200).json(orders);
+    } catch {
+      res.status(400).json({ message: "Something went wrong" });
+    }
+  }
+
+  async updateStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const order = await Order.findByPk(id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      await order.update({ status });
+
+      return res.json(order);
+    } catch (error) {
+      return res.status(500).json({ error: "Error updating order status" });
+    }
   }
 }
 
