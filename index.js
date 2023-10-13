@@ -12,6 +12,40 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
+const nodemailer = require("nodemailer");
+
+const sendEmail = async (mailOptions) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "mintPass@gmail.com",
+        pass: "aojdmccqtzikhcdg",
+      },
+    });
+
+    transporter.sendMail(
+      {
+        from: mailOptions.from ?? "mintPass@gmail.com",
+        ...mailOptions,
+      },
+      (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      }
+    );
+  } catch (err) {}
+};
+
+const mailOptions = {
+  to: "narek.khachatryan@solicy.net",
+  subject: "You have successfully registered",
+  text: "Welcome to Passphrase",
+};
+
 // socket.io
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
@@ -73,6 +107,11 @@ app.use("/api", router);
 // app.use(errorHandler);
 app.get("/", (_, res) => {
   return res.send("Hello World!");
+});
+
+app.post("/contact", async (req, res) => {
+  const res1 = await sendEmail(mailOptions);
+  return res.send(res1);
 });
 
 const start = async () => {
