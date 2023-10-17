@@ -6,45 +6,11 @@ const app = express();
 const router = require("./routes/index");
 const fileUpload = require("express-fileupload");
 const PORT = process.env.PORT || 5000;
-
 const bodyParser = require("body-parser");
+const sendEmail = require("./services/email");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-
-const nodemailer = require("nodemailer");
-
-const sendEmail = async (mailOptions) => {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "mintPass@gmail.com",
-        pass: "aojdmccqtzikhcdg",
-      },
-    });
-
-    transporter.sendMail(
-      {
-        from: mailOptions.from ?? "mintPass@gmail.com",
-        ...mailOptions,
-      },
-      (error, info) => {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Email sent: " + info.response);
-        }
-      }
-    );
-  } catch (err) {}
-};
-
-const mailOptions = {
-  to: "narek.khachatryan@solicy.net",
-  subject: "You have successfully registered",
-  text: "Welcome to Passphrase",
-};
 
 // socket.io
 const http = require("http").createServer(app);
@@ -110,8 +76,74 @@ app.get("/", (_, res) => {
 });
 
 app.post("/contact", async (req, res) => {
-  const res1 = await sendEmail(mailOptions);
-  return res.send(res1);
+  const { first_name, last_name, email, message } = req.body;
+
+  const emailTemplate = `
+  <html>
+    <head>
+      <style>
+        /* Define your inline CSS styles here */
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #ffffff;
+        }
+        .header {
+          background-color: #007BFF;
+          color: #fff;
+          text-align: center;
+          padding: 10px;
+        }
+        .content {
+          padding: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Best Systems</h1>
+        </div>
+        <div>
+          <div>
+            First name: ${first_name}
+          </div>
+          <div>
+            Last name: ${last_name}
+          </div>
+          <div>
+            Email: ${email}
+          </div>
+          <div>
+            Message: ${message}
+          </div>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
+`;
+
+  const mailOptions = {
+    to: "narek.khachatryan@solicy.net",
+    from: email,
+    subject: "You've received a message from Best",
+    text: "Custom Email Template",
+    html: emailTemplate,
+  };
+  try {
+    await sendEmail(mailOptions);
+    return res.status(200).json({ message: "Successfully sent!" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
 });
 
 const start = async () => {
