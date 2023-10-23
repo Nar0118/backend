@@ -8,6 +8,7 @@ const fileUpload = require("express-fileupload");
 const PORT = process.env.PORT || 5000;
 const bodyParser = require("body-parser");
 const sendEmail = require("./services/email");
+const onlinePayment = require("./ameriaPayment");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -144,6 +145,37 @@ app.post("/contact", async (req, res) => {
   } catch (err) {
     return res.status(400).json(err);
   }
+});
+
+// Payment with ameria bank api
+app.post("/initiate-payment", (req, res) => {
+  const {
+    clientID,
+    username,
+    password,
+    backURL,
+    currency,
+    orderID,
+    amount,
+    cardHolderID,
+    opaque,
+  } = req.body;
+
+  const paymentData = {
+    ClientID: clientID,
+    Username: username,
+    Password: password,
+    BackURL: backURL,
+    Currency: currency,
+    OrderID: orderID,
+    Amount: amount,
+    CardHolderID: cardHolderID,
+    Opaque: opaque,
+  };
+
+  onlinePayment(paymentData);
+
+  return res.send("Hello World!");
 });
 
 const start = async () => {
