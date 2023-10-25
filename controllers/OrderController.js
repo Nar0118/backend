@@ -1,4 +1,5 @@
 const { Order, OrderDevice, Basket, Device } = require("../models/models");
+const onlinePayment = require("../ameriaPayment");
 
 class OrderController {
   async create(req, res) {
@@ -12,6 +13,7 @@ class OrderController {
       lastName,
       paymentMethod,
       phone,
+      backURL,
     } = req.body;
 
     const order = await Order.create({
@@ -25,6 +27,30 @@ class OrderController {
       payment_method: paymentMethod,
       status: "pending",
     });
+
+    let payment = {};
+
+    if (paymentMethod === "card") {
+      const paymentData = {
+        ClientID: 1,
+        Username: `${firstName} ${lastName}`,
+        // Password: password,
+        BackURL: backURL,
+        // Currency: currency || "AMD",
+        OrderID: order.id,
+        Amount: price,
+        CardHolderID: "cardHolderID",
+        Opaque: "opaque",
+      };
+
+      payment = await onlinePayment(paymentData);
+
+      if (!payment) {
+        return res.status(400).json({ message: "Something went wrong!" });
+      }
+
+      // res.status(201).json(payment);
+    }
 
     for (let deviceId in deviceIds) {
       await OrderDevice.create({
@@ -40,7 +66,9 @@ class OrderController {
       },
     });
 
-    res.status(201).json({ message: "Order has been successfully created!" });
+    res
+      .status(201)
+      .json({ message: "Order has been successfully created!", response: payment });
   }
 
   async getOne(req, res) {
