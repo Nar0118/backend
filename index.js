@@ -8,6 +8,7 @@ const fileUpload = require("express-fileupload");
 const PORT = process.env.PORT || 5000;
 const bodyParser = require("body-parser");
 const sendEmail = require("./services/email");
+const onlinePayment = require("./ameriaPayment");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -64,13 +65,10 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors());
-// app.use(express.static("uploads"));
-// app.use("/uploads", express.static("controllers/uploads"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use("/api", router);
-// app.use(errorHandler);
 app.get("/", (_, res) => {
   return res.send("Hello World!");
 });
@@ -82,7 +80,6 @@ app.post("/contact", async (req, res) => {
   <html>
     <head>
       <style>
-        /* Define your inline CSS styles here */
         body {
           font-family: Arial, sans-serif;
           background-color: #f4f4f4;
@@ -146,17 +143,51 @@ app.post("/contact", async (req, res) => {
   }
 });
 
+// Payment with ameria bank api
+app.post("/initiate-payment", async (req, res) => {
+  const {
+    clientID,
+    username,
+    password,
+    backURL,
+    // currency,
+    orderID,
+    amount,
+    cardHolderID,
+    opaque,
+  } = req.body;
+
+  const paymentData = {
+    ClientID: clientID,
+    Username: username,
+    Password: password,
+    BackURL: backURL,
+    // Currency: currency || "AMD",
+    OrderID: orderID,
+    Amount: amount,
+    CardHolderID: cardHolderID,
+    Opaque: opaque,
+  };
+
+  const payment = await onlinePayment(paymentData);
+  if (!!payment) {
+    return res.json(payment);
+  }
+
+  res.status(400).json({ message: "Something went wrong!" });
+});
+
 const start = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync();
-    // app.listen(PORT, () =>
-    //   console.log(`Server is running on http://localhost:${PORT}`)
-    // );
+    app.listen(PORT, () =>
+      console.log(`Server is running on http://localhost:${PORT}`)
+    );
 
-    http.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
+    // http.listen(PORT, () => {
+    //   console.log(`Server listening on port ${PORT}`);
+    // });
   } catch (e) {
     console.log(e);
   }
