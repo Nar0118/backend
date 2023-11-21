@@ -129,13 +129,13 @@ app.post("/contact", async (req, res) => {
 `;
 
   const mailOptions = {
-    to: "narek.khachatryan@solicy.net",
+    to: "Info@bebest.am",
     from: email,
     subject: "You've received a message from Best",
     text: "Custom Email Template",
     html: emailTemplate,
   };
-  try {
+  try { 
     await sendEmail(mailOptions);
     return res.status(200).json({ message: "Successfully sent!" });
   } catch (err) {
