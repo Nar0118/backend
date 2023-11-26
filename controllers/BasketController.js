@@ -22,7 +22,7 @@ class BasketController {
   }
 
   async getOne(req, res) {
-    const userId = +req.params.id;
+    const userId = +req.params.id || req.user.id;
     const basket = await Basket.findAll({
       where: { userId },
       include: [
