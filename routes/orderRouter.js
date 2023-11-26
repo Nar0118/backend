@@ -7,5 +7,6 @@ router.post("/", authMiddleware, OrderController.create);
 router.get("/", authMiddleware, OrderController.getAll);
 router.get("/:id", authMiddleware, OrderController.getOne);
 router.patch("/:id", authMiddleware, OrderController.updateStatus);
+router.delete("/:id", authMiddleware, OrderController.remove);
 
 module.exports = router;

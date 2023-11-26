@@ -117,6 +117,19 @@ class OrderController {
       return res.status(500).json({ error: "Error updating order status" });
     }
   }
+
+  async remove(req, res) {
+    const { id } = req.params;
+    const brand = await Order.findByPk(id);
+
+    if (!brand) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    await brand.destroy();
+
+    return res.status(204).json({ message: "Order removed successfully" });
+  }
 }
 
 module.exports = new OrderController();
