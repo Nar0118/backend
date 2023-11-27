@@ -2,7 +2,9 @@ const { Basket, Device } = require("../models/models");
 
 class BasketController {
   async create(req, res) {
-    const { userId, deviceId, quantity } = req.body;
+    const { deviceId, quantity } = req.body;
+    const userId = req.body.userId || req.user.id;
+
     const findBasket = await Basket.findOne({
       where: { userId, deviceId },
     });
