@@ -87,8 +87,7 @@ class UserController {
         last_name,
         confirmPassword,
       } = req.body;
-      const file = req.file;
-      let password = undefined;
+      let password;
 
       if (oldPassword && oldPassword && confirmPassword) {
         if (confirmPassword !== newPassword) {
