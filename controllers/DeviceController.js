@@ -7,12 +7,11 @@ class DeviceController {
   async create(req, res, next) {
     try {
       const { name, price, brandId, typeId, description, img } = req.body;
-
       const device = await Device.create({
         name,
-        price,
-        brandId,
-        typeId,
+        price: Number(price),
+        brandId: Number(brandId),
+        typeId: Number(typeId),
         description,
         img,
       });
@@ -22,6 +21,7 @@ class DeviceController {
       next(ApiError.badRequest(e.message));
     }
   }
+
   async getOne(req, res) {
     const { id } = req.params;
     const device = await Device.findOne({
