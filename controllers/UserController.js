@@ -137,7 +137,9 @@ class UserController {
 
   async check(req, res) {
     const { id } = req.user;
+    console.log('-------------------id------------------>', id);
     const user = await User.findOne({ id });
+    console.log('-------------------user------------------>', user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
