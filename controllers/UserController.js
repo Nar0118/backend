@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const generateJwt = (values) => {
   return jwt.sign({ ...values }, process.env.SECRET_KEY, {
-    // expiresIn: "24h",
+    expiresIn: '240h',
   });
 };
 
@@ -137,9 +137,7 @@ class UserController {
 
   async check(req, res) {
     const { id } = req.user;
-    console.log("-------------------id------------------>", id);
     const user = await User.findOne({ where: { id } });
-    console.log("-------------------user------------------>", user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
