@@ -66,9 +66,10 @@ class OrderController {
       },
     });
 
-    res
-      .status(201)
-      .json({ message: "Order has been successfully created!", response: payment });
+    res.status(201).json({
+      message: "Order has been successfully created!",
+      response: payment,
+    });
   }
 
   async getOne(req, res) {
@@ -87,11 +88,15 @@ class OrderController {
     }
   }
 
-  async getAll(_, res) {
+  async getAll(req, res) {
     try {
+      const { page, limit } = req.query;
+      const offset = (page - 1) * limit;
       const orders = await Order.findAll({
         include: Device,
         order: [["createdAt", "DESC"]],
+        limit: limit || 10,
+        offset: offset || 0,
       });
 
       res.status(200).json(orders);
